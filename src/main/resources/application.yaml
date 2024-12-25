@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: cathaydemo
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE #??RAM????????
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: none  # ?????????????create, create-drop, update, none(????resources?.sql)
+    show-sql: true
+  h2:
+    console:
+      enabled: true         # ?? H2 ???
+      path: /h2-console     # ?????
+
+logging:
+  level:
+    org:
+      springframework: #??schema.sql log
+        jdbc:
+          datasource:
+            init: DEBUG
