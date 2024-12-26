@@ -1,31 +1,12 @@
-package com.demo.cathaydemo.entity;
+package com.demo.cathaydemo.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
+public class NewCurrencyRq {
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import java.util.Date;
-
-@Entity
-@Table(name = "currencies")
-public class Currency {
-
-    @Id
     private String code;
     private String symbol;
     private String rate;
     private String description;
-
-    @Column(name = "rate_float")
-    @JsonProperty("rate_float")
     private Double rateFloat;
-
-    @Column(name = "update_time")
-    @JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss")
-    private Date updateTime;
 
     public String getCode() {
         return code;
@@ -67,14 +48,6 @@ public class Currency {
         this.rateFloat = rateFloat;
     }
 
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
     @Override
     public String toString() {
         return "{" +
@@ -83,8 +56,6 @@ public class Currency {
                 ", rate='" + rate + '\'' +
                 ", description='" + description + '\'' +
                 ", rateFloat=" + rateFloat +
-                ", updateTime=" + updateTime +
                 '}';
     }
 }
-

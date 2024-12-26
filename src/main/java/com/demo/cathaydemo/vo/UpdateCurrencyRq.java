@@ -1,16 +1,15 @@
 package com.demo.cathaydemo.vo;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sun.istack.internal.NotNull;
 
-public class BpiInfo {
+public class UpdateCurrencyRq {
 
+    @NotNull
     private String code;
     private String symbol;
     private String rate;
     private String description;
-
-    @JsonProperty("rate_float")
-    private double rateFloat;
+    private Double rateFloat;
 
     public String getCode() {
         return code;
@@ -44,11 +43,11 @@ public class BpiInfo {
         this.description = description;
     }
 
-    public double getRateFloat() {
+    public Double getRateFloat() {
         return rateFloat;
     }
 
-    public void setRateFloat(double rateFloat) {
+    public void setRateFloat(Double rateFloat) {
         this.rateFloat = rateFloat;
     }
 

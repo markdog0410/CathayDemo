@@ -1,31 +1,14 @@
-package com.demo.cathaydemo.entity;
+package com.demo.cathaydemo.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.demo.cathaydemo.util.ResultBean;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import java.util.Date;
+public class UpdateCurrencyRs extends ResultBean {
 
-@Entity
-@Table(name = "currencies")
-public class Currency {
-
-    @Id
     private String code;
     private String symbol;
     private String rate;
     private String description;
-
-    @Column(name = "rate_float")
-    @JsonProperty("rate_float")
-    private Double rateFloat;
-
-    @Column(name = "update_time")
-    @JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss")
-    private Date updateTime;
+    private double rateFloat;
 
     public String getCode() {
         return code;
@@ -59,20 +42,12 @@ public class Currency {
         this.description = description;
     }
 
-    public Double getRateFloat() {
+    public double getRateFloat() {
         return rateFloat;
     }
 
-    public void setRateFloat(Double rateFloat) {
+    public void setRateFloat(double rateFloat) {
         this.rateFloat = rateFloat;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
     }
 
     @Override
@@ -83,8 +58,6 @@ public class Currency {
                 ", rate='" + rate + '\'' +
                 ", description='" + description + '\'' +
                 ", rateFloat=" + rateFloat +
-                ", updateTime=" + updateTime +
                 '}';
     }
 }
-

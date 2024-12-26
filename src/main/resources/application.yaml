@@ -3,23 +3,23 @@ spring:
     name: cathaydemo
 
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE #??RAM????????
+    url: jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE; #h2 in ram, close then delete
     driver-class-name: org.h2.Driver
     username: sa
     password:
   jpa:
     hibernate:
-      ddl-auto: none  # ?????????????create, create-drop, update, none(????resources?.sql)
+      ddl-auto: none  # isAutoCreateSchemaType: create, create-drop, update, none(auto search resources/schema.sql)
     show-sql: true
   h2:
     console:
-      enabled: true         # ?? H2 ???
-      path: /h2-console     # ?????
+      enabled: true         # isEnabled for h2
+      path: /h2-console     # h2 backend path
 
 logging:
   level:
     org:
-      springframework: #??schema.sql log
+      springframework: #show schema.sql log
         jdbc:
           datasource:
             init: DEBUG

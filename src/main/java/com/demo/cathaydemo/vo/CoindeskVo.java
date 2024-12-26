@@ -1,5 +1,7 @@
 package com.demo.cathaydemo.vo;
 
+import com.demo.cathaydemo.entity.Currency;
+
 import java.util.Map;
 
 public class CoindeskVo {
@@ -7,7 +9,7 @@ public class CoindeskVo {
     private DeskTime time;
     private String disclaimer;
     private String chartName;
-    private Map<String, BpiInfo> bpi;
+    private Map<String, Currency> bpi;
 
     public DeskTime getTime() {
         return time;
@@ -33,11 +35,11 @@ public class CoindeskVo {
         this.chartName = chartName;
     }
 
-    public Map<String, BpiInfo> getBpi() {
+    public Map<String, Currency> getBpi() {
         return bpi;
     }
 
-    public void setBpi(Map<String, BpiInfo> bpi) {
+    public void setBpi(Map<String, Currency> bpi) {
         this.bpi = bpi;
     }
 
