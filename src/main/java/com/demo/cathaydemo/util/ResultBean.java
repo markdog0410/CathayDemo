@@ -1,8 +1,15 @@
 package com.demo.cathaydemo.util;
 
 public class ResultBean {
-    private String rsCode = "0000";
-    private String message ="success";
+    private String rsCode;
+    private String message;
+
+    public ResultBean() {}
+
+    public ResultBean(ErrorCode errorCode) {
+        this.rsCode = errorCode.getCode();
+        this.message = errorCode.getMessage();
+    }
 
     public String getRsCode() {
         return rsCode;

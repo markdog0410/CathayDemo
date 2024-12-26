@@ -2,6 +2,8 @@ package com.demo.cathaydemo.service;
 
 import com.demo.cathaydemo.dao.CurrencyRepository;
 import com.demo.cathaydemo.entity.Currency;
+import com.demo.cathaydemo.util.ErrorCode;
+import com.demo.cathaydemo.util.CurrencyExceptionHandler;
 import com.demo.cathaydemo.vo.CoindeskVo;
 import com.demo.cathaydemo.vo.NewCurrencyRq;
 import com.demo.cathaydemo.vo.UpdateCurrencyRq;
@@ -24,11 +26,26 @@ public class CurrencyService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public List<Currency> getAllCurrencies() {
-        return currencyRepository.findAll();
+    public CoindeskVo fetchCoinDeskApi(){
+        try {
+            String url = "https://api.coindesk.com/v1/bpi/currentprice.json";
+            return restTemplate.getForEntity(url, CoindeskVo.class).getBody();
+        }catch (Exception e){
+            throw new CurrencyExceptionHandler(ErrorCode.FETCH_COINDESK_API_ERROR);
+        }
     }
 
-    public String fethAndSaveCurrencies() {
+    public List<Currency> getAllCurrencies() {
+        try{
+            return currencyRepository.findAll();
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new CurrencyExceptionHandler(ErrorCode.SYSTEM_ERROR);
+        }
+
+    }
+
+    public boolean fethAndSaveCurrencies() {
         String url = "https://api.coindesk.com/v1/bpi/currentprice.json";
         try {
             CoindeskVo response = restTemplate.getForEntity(url, CoindeskVo.class).getBody();
@@ -50,35 +67,37 @@ public class CurrencyService {
 
                     currencyRepository.save(currencyInfo);
                 }
+                return true;
+            }else {
+                return false;
             }
-            return "Fetch/save currencies successfully.";
         } catch (Exception e) {
             e.printStackTrace();
-            return "Something wrong with fetch/save.";
+            throw new CurrencyExceptionHandler(ErrorCode.TRANSFORM_DATA_ERROR);
         }
 
     }
 
-    public String addNewCurrency(NewCurrencyRq request) {
+    public boolean addNewCurrency(NewCurrencyRq request) {
         try {
             boolean isExisted = currencyRepository.existsById(request.getCode());
             if (isExisted) {
-                return request.getCode() + " had already existed";
+                return false;
+            }else {
+                Currency currency = new Currency();
+                currency.setCode(request.getCode());
+                currency.setSymbol(request.getSymbol());
+                currency.setRate(request.getRate());
+                currency.setDescription(request.getDescription());
+                currency.setRateFloat(request.getRateFloat());
+                currency.setUpdateTime(new Date());
+
+                currencyRepository.save(currency);
+                return true;
             }
-            Currency currency = new Currency();
-            currency.setCode(request.getCode());
-            currency.setSymbol(request.getSymbol());
-            currency.setRate(request.getRate());
-            currency.setDescription(request.getDescription());
-            currency.setRateFloat(request.getRateFloat());
-            currency.setUpdateTime(new Date());
-
-            currencyRepository.save(currency);
-            return "Add new currency successfully";
-
         } catch (Exception e) {
             e.printStackTrace();
-            return "Something wrong with addNewCurrency api.";
+            throw new CurrencyExceptionHandler(ErrorCode.INSERT_NEW_CURRENCY_ERROR);
         }
     }
 
@@ -107,17 +126,24 @@ public class CurrencyService {
             }
         }catch (Exception e) {
             e.printStackTrace();
-            return null;
+            throw new CurrencyExceptionHandler(ErrorCode.UPDATE_CURRENCY_ERROR);
         }
     }
 
     public boolean deleteCurrencyByCode(String code){
-        Optional<Currency> currencyOptional = currencyRepository.findById(code);
-        if (currencyOptional.isPresent()){
-            currencyRepository.deleteById(code);
-            return true;
-        }else{
-            return false;
+        try {
+            Optional<Currency> currencyOptional = currencyRepository.findById(code);
+            if (currencyOptional.isPresent()) {
+                currencyRepository.deleteById(code);
+                return true;
+            } else {
+                return false;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new CurrencyExceptionHandler(ErrorCode.DELETE_CURRENCY_ERROR);
         }
     }
+
+
 }

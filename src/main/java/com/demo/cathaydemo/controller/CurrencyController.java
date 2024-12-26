@@ -2,7 +2,8 @@ package com.demo.cathaydemo.controller;
 
 import com.demo.cathaydemo.entity.Currency;
 import com.demo.cathaydemo.service.CurrencyService;
-import com.demo.cathaydemo.util.ResultBean;
+import com.demo.cathaydemo.util.ErrorCode;
+import com.demo.cathaydemo.util.CurrencyExceptionHandler;
 import com.demo.cathaydemo.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,52 +17,120 @@ public class CurrencyController {
     @Autowired
     private CurrencyService currencyService;
 
+    @GetMapping("/fetchCoinDesk")
+    public FetchCoinDeskRs fetchCoinDeskApi(){
+        FetchCoinDeskRs response = new FetchCoinDeskRs();
+        try {
+            CoindeskVo result = currencyService.fetchCoinDeskApi();
+            response.setCoindesk(result);
+            response.setRsCode(ErrorCode.SUCCESS.getCode());
+            response.setMessage(ErrorCode.SUCCESS.getMessage());
+            return  response;
+        }catch (CurrencyExceptionHandler e){
+            response.setRsCode(e.getErrorCode().getCode());
+            response.setMessage(e.getErrorCode().getMessage());
+            return response;
+        }
+    }
 
-    @GetMapping("/fetchApi")
-    public String fetchApi(){
-        return currencyService.fethAndSaveCurrencies();
+    @GetMapping("/fetchAndTransform")
+    public TransformCoindeskRs fetchApi(){
+        TransformCoindeskRs response = new TransformCoindeskRs();
+        try {
+            boolean isTransformed = currencyService.fethAndSaveCurrencies();
+            if(isTransformed){
+                response.setCurrencies(currencyService.getAllCurrencies());
+                response.setRsCode(ErrorCode.SUCCESS.getCode());
+                response.setMessage(ErrorCode.SUCCESS.getMessage());
+            }else {
+                response.setRsCode(ErrorCode.TRANSFORM_DATA_FAILED.getCode());
+                response.setMessage(ErrorCode.TRANSFORM_DATA_FAILED.getMessage());
+            }
+            return response;
+        }catch (CurrencyExceptionHandler e){
+            response.setRsCode(e.getErrorCode().getCode());
+            response.setMessage(e.getErrorCode().getMessage());
+            return response;
+        }
     }
 
     @GetMapping("/getAllCurrencies")
-    public List<Currency> getAllCurrencies() {
-        return currencyService.getAllCurrencies();
+    public GetAllCurrenciesRs getAllCurrencies() {
+        GetAllCurrenciesRs response = new GetAllCurrenciesRs();
+        try {
+            List<Currency> currencies = currencyService.getAllCurrencies();
+            response.setCurrencies(currencies);
+            response.setRsCode(ErrorCode.SUCCESS.getCode());
+            response.setMessage(ErrorCode.SUCCESS.getMessage());
+            return response;
+        }catch (CurrencyExceptionHandler e){
+            response.setRsCode(e.getErrorCode().getCode());
+            response.setMessage(e.getErrorCode().getMessage());
+            return response;
+        }
     }
 
     @PostMapping("/addNewCurrency")
-    public String addNewCurrency(@RequestBody NewCurrencyRq request){
-        return currencyService.addNewCurrency(request);
+    public NewCurrencyRs addNewCurrency(@RequestBody NewCurrencyRq request){
+        NewCurrencyRs response = new NewCurrencyRs();
+        try {
+            boolean isCurrencyAdded = currencyService.addNewCurrency(request);
+            if(isCurrencyAdded){
+                response.setRsCode(ErrorCode.SUCCESS.getCode());
+                response.setMessage(ErrorCode.SUCCESS.getMessage());
+            }else {
+                response.setRsCode(ErrorCode.CURRENCY_ALREADY_EXISTED.getCode());
+                response.setMessage(ErrorCode.CURRENCY_ALREADY_EXISTED.getMessage());
+            }
+            return response;
+        }catch (CurrencyExceptionHandler e){
+            response.setRsCode(e.getErrorCode().getCode());
+            response.setMessage(e.getErrorCode().getMessage());
+            return response;
+        }
     }
 
     @PostMapping("/updateCurrency")
     public UpdateCurrencyRs updateCurrency(@RequestBody UpdateCurrencyRq request){
         UpdateCurrencyRs response = new UpdateCurrencyRs();
-        Currency updateResult = currencyService.updateCurrency(request);
-        if(updateResult != null){
-            response.setCode(updateResult.getCode());
-            response.setSymbol(updateResult.getSymbol());
-            response.setRate(updateResult.getRate());
-            response.setDescription(updateResult.getDescription());
-            response.setRateFloat(updateResult.getRateFloat());
+        try {
+            Currency updateResult = currencyService.updateCurrency(request);
+            if (updateResult != null) {
+                response.setCurrency(updateResult);
+                response.setRsCode(ErrorCode.SUCCESS.getCode());
+                response.setMessage(ErrorCode.SUCCESS.getMessage());
+            } else {
+                response.setRsCode(ErrorCode.NOT_MATCH_CURRENCY.getCode());
+                response.setMessage(ErrorCode.NOT_MATCH_CURRENCY.getMessage());
+            }
             return response;
-        }else {
-            response.setRsCode("9999");
-            response.setMessage("Something wrong in updateCurrency.");
+        }catch (CurrencyExceptionHandler e){
+            response.setRsCode(e.getErrorCode().getCode());
+            response.setMessage(e.getErrorCode().getMessage());
             return response;
         }
-
     }
 
     @PostMapping("/deleteByCode")
     public DeleteCurrencyRs deleteCurrencyByCode(@RequestBody DeleteCurrencyRq request){
-        boolean isDeleted = currencyService.deleteCurrencyByCode(request.getCode());
         DeleteCurrencyRs response = new DeleteCurrencyRs();
-        if(!isDeleted){
-            response.setMessage("Delete failed.");
-            response.setRsCode("9999");
+        try {
+            boolean isDeleted = currencyService.deleteCurrencyByCode(request.getCode());
+
+            if (isDeleted) {
+                response.setMessage(ErrorCode.SUCCESS.getMessage());
+                response.setRsCode(ErrorCode.SUCCESS.getCode());
+            } else {
+                response.setRsCode(ErrorCode.NOT_MATCH_CURRENCY.getCode());
+                response.setMessage(ErrorCode.NOT_MATCH_CURRENCY.getMessage());
+            }
             return response;
-        }else{
+        }catch (CurrencyExceptionHandler e){
+            response.setRsCode(e.getErrorCode().getCode());
+            response.setMessage(e.getErrorCode().getMessage());
             return response;
         }
-
     }
+
+
 }
